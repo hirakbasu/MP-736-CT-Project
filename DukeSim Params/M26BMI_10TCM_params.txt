@@ -1,0 +1,71 @@
+### DUKESIM_PARAMS
+# M26BMI_10TCM
+
+# Notes on formatting: 
+# Each parameter is identified by a unique tag and string, formatted tag:string
+# The tag must be exact. 
+# Additional ':' cannot be used in the tag or string.
+# The string can have any amount of whitespace before/after or comments after.
+
+
+## 1. Run parameters
+
+multiply_constant: 1      # constant value for multiplying data
+
+#MainDir: ./output/ExampleDir/   # directory where output will be written
+MainDir: /work/hb226/updates_for_hirak/output/M26BMI_10TCM/
+
+
+## 2. Define the phantom:
+
+#include: ./input/phantom/water/water_phantom_params.txt     # phantom parameter file
+include: ./input/phantom/XCAT_M_26BMI/XCAT_M_26BMI_phantom_params.txt
+
+## 3. Define the scanner:
+
+dual_source: no     # dual source? yes/no
+source1_geometry: ./input/scanner/duke-1/duke-1.txt     # scanner parameter file
+#source2_geometry: ./path/to/parameters_scanner2.txt  # ignore for single source
+
+## 4. Define the simulation protocol:
+
+noise: yes                 # noise
+MonoEnergetic: no          # mono or poly-energetic
+BHC: yes                   # beam hardening correction
+z_motion: helical          # type of scan (axial/helical)
+mA: 340                   # tube current mA = eff_mas*pitch/rot_p_sec
+pitch: 1.0                 # helical pitch factor
+N_Rotations: 9             # Number of rotations to perform
+
+## 5. Modules:
+
+### Scatter module:
+run_MCGPU: yes
+N_histories: 5.e8
+P_Scatter: 36 
+tally_material_dose: yes
+tally_voxel_dose: yes 
+
+### Primary ray-tracing module:
+run_RTcat: yes          
+water_mu_file: ./input/water_MU_1_140kV.bin      # for BHC
+
+number_source_samples: 4 # 1,4,5 are our options. Izzy can explain. Deals with sharpness/realism
+number_detector_samples: 4
+
+### Tube Current Modulation (TCM) module:
+TCM: yes
+alpha: 1.0
+L_ref: 32.0
+lateral_angle: 0
+
+### reconstruct images
+run_recon: yes
+recon_type: single_source_WFBP      #   single_source_WFBP or single_source_SART
+filter: ram-lak                     # ram-lak, hann, cosine, hamming, or shepp-logan
+slice_thickness: 1
+f50: 0.6  # you can technically set your ideal spatial resolution here. not normal. Dr. Solomon: should not affect anything if using ram-lak filter, but may affect roll off for other filters
+recon_FoV: 400 # mm, Izzy sees 400 and 500 in normal use
+Z_offset: 0
+Z_range: -1                         # -1 = maximum range
+matsize: 512 # matrix size
